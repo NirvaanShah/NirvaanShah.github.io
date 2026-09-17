@@ -1,0 +1,1731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nirvaan Shah</title>
+<meta name="description" content="Nirvaan Shah - civil engineering at the University of Toronto. Power-grid modelling, environmental compliance, renewable energy design.">
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Nirvaan Shah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Instrument+Sans:wght@400..700&family=DM+Mono:wght@300;400;500&display=swap">
+
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#FBFAF8;
+  --bg-sunk:#F1F0EB;
+  --bg-raise:#FFFFFF;
+  --ink:#141A20;
+  --ink-soft:#525C66;
+  --ink-faint:#8A929B;
+  --line:#DEDDD6;
+  --line-hard:#141A20;
+  --grid:#E7E6DF;
+
+  --accent:#1D4E7A;
+  --accent-soft:#EAF0F6;
+  --on-accent:#FFFFFF;
+
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"DM Mono","SFMono-Regular",Menlo,Consolas,monospace;
+
+  --wide:'wdth' 116;
+  --xwide:'wdth' 124;
+
+  --gut:clamp(20px,5vw,64px);
+  --rail:78px;
+  --maxw:1140px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1216;
+    --bg-sunk:#0A0E11;
+    --bg-raise:#161C22;
+    --ink:#E9EAE6;
+    --ink-soft:#98A1AA;
+    --ink-faint:#69727B;
+    --line:#242C33;
+    --line-hard:#E9EAE6;
+    --grid:#192026;
+
+    --accent:#7CB0DA;
+    --accent-soft:#152430;
+    --on-accent:#0E1216;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1216;
+  --bg-sunk:#0A0E11;
+  --bg-raise:#161C22;
+  --ink:#E9EAE6;
+  --ink-soft:#98A1AA;
+  --ink-faint:#69727B;
+  --line:#242C33;
+  --line-hard:#E9EAE6;
+  --grid:#192026;
+
+  --accent:#7CB0DA;
+  --accent-soft:#152430;
+  --on-accent:#0E1216;
+}
+
+/* ============ BASE ============ */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+#gridbg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 40%, transparent 86%);
+  mask-image:linear-gradient(to bottom, #000 0%, #000 40%, transparent 86%);
+  will-change:transform;
+}
+.shell{position:relative;z-index:1}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gut)}
+
+/* ============ TYPE ROLES ============ */
+.mono{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-faint);
+}
+.sheet-label{
+  display:flex;align-items:baseline;gap:14px;
+  border-bottom:1px solid var(--line-hard);padding-bottom:10px;
+  margin-bottom:clamp(26px,4vw,44px);
+}
+.sheet-label .tag{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent);padding:4px 9px 3px;white-space:nowrap;
+}
+.sheet-label h2{
+  margin:0;font-family:var(--f-display);font-variation-settings:var(--xwide);
+  font-weight:800;font-size:clamp(24px,3.9vw,40px);
+  line-height:1;letter-spacing:-.015em;text-wrap:balance;
+}
+.sheet-label .note{margin-left:auto;text-align:right;display:none}
+@media(min-width:820px){.sheet-label .note{display:block}}
+
+section{padding-block:clamp(56px,8vw,104px)}
+
+/* ============ STATION RAIL ============ */
+.rail{
+  position:fixed;left:0;top:0;bottom:0;width:var(--rail);z-index:5;
+  display:none;border-right:1px solid var(--line);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter:blur(6px);
+}
+@media(min-width:1120px){.rail{display:block}}
+body.detail .rail{display:none}
+.rail-track{position:absolute;left:20px;top:132px;bottom:100px;width:1px;background:var(--line)}
+.rail-fill{position:absolute;left:0;top:0;width:1px;height:0;background:var(--accent);transition:height .1s linear}
+.rail-head{position:absolute;left:16px;top:0;width:9px;height:9px;background:var(--accent);transform:translateY(-50%);transition:top .1s linear}
+.rail-readout{
+  position:absolute;top:86px;left:0;right:0;text-align:center;
+  font-family:var(--f-mono);font-size:13.5px;color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.rail-cap{
+  position:absolute;left:0;right:0;font-family:var(--f-mono);font-size:9.5px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);text-align:center;
+}
+.rail-cap.top{top:66px}
+.rail-ticks{position:absolute;left:12px;top:132px;bottom:100px;width:17px}
+.rail-tick{position:absolute;left:0;width:17px;height:1px;background:var(--line)}
+.rail-tick.on{background:var(--accent);height:2px}
+.rail-nav{position:absolute;left:40px;top:132px;bottom:100px;width:24px}
+.rail-dot{position:absolute;left:0;width:22px;height:22px;transform:translateY(-11px);display:grid;place-items:center}
+.rail-dot i{display:block;width:6px;height:6px;background:var(--line);transition:background .18s, transform .18s}
+.rail-dot:hover i{background:var(--ink-soft);transform:scale(1.5)}
+.rail-dot.on i{background:var(--accent);transform:scale(1.6)}
+.rail-dot span{
+  position:absolute;left:18px;top:50%;transform:translateY(-50%);
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  background:var(--ink);color:var(--bg);padding:3px 7px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .16s;
+}
+.rail-dot:hover span,.rail-dot:focus-visible span{opacity:1}
+@media(min-width:1120px){.shell{padding-left:var(--rail)}}
+
+/* ============ HERO ============ */
+.hero{padding-top:clamp(40px,6vw,76px);padding-bottom:clamp(44px,5vw,72px)}
+.hero-top{
+  display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;
+  border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:clamp(26px,4.6vw,46px);
+}
+.hero-top .dot{width:7px;height:7px;background:var(--accent);border-radius:50%;flex:none}
+.hero-top .push{margin-left:auto}
+
+.name{
+  margin:0;font-family:var(--f-display);font-variation-settings:var(--xwide);
+  font-weight:800;font-size:clamp(44px,10.4vw,124px);
+  line-height:.88;letter-spacing:-.032em;text-transform:uppercase;
+  display:flex;flex-wrap:wrap;column-gap:.16em;
+}
+.name .w{display:inline-flex;overflow:hidden;padding-bottom:.05em}
+.name .c{display:inline-block}
+.js-motion .name .c{transform:translateY(105%)}
+.js-motion .name.lit .c{transform:translateY(0);transition:transform .58s cubic-bezier(.16,.9,.24,1)}
+.name .c.k{color:var(--accent)}
+
+.dimline{margin-top:18px;display:flex;align-items:center;color:var(--ink-faint)}
+.dimline .end{width:1px;height:14px;background:currentColor;flex:none}
+.dimline .bar{flex:1 1 auto;height:1px;background:currentColor;position:relative;min-width:20px}
+.dimline .bar::before{content:"";position:absolute;top:-3.5px;width:0;height:0;border-block:4px solid transparent}
+.dimline .bar.l::before{left:0;border-right:9px solid currentColor}
+.dimline .bar.r::before{right:0;border-left:9px solid currentColor}
+.dimline .txt{
+  flex:0 1 auto;padding-inline:14px;
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.js-motion .dimline .bar{transform-origin:left center;animation:grow .9s .4s cubic-bezier(.3,.9,.3,1) both}
+.js-motion .dimline .bar.r{transform-origin:right center}
+.js-motion .dimline .txt{animation:fadein .5s 1s both}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+
+.hero-grid{display:grid;gap:clamp(24px,3.6vw,48px);grid-template-columns:1fr;margin-top:clamp(28px,4vw,46px);align-items:start}
+@media(min-width:860px){.hero-grid{grid-template-columns:minmax(0,1.4fr) minmax(230px,.8fr)}}
+.lede{margin:0;font-size:clamp(18px,2.3vw,25px);line-height:1.38;max-width:24ch;font-weight:500;letter-spacing:-.01em}
+.lede em{font-style:normal;box-shadow:inset 0 -.3em 0 var(--accent-soft)}
+.lede .b{color:var(--accent);font-weight:600}
+
+.cta-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;padding:12px 18px;
+  border:1px solid var(--line-hard);background:var(--bg-raise);
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  transition:transform .16s, background .16s, filter .16s;
+  text-decoration:none;will-change:transform;
+}
+.btn:hover{background:var(--bg-sunk)}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.solid:hover{background:var(--accent);filter:brightness(1.1)}
+.btn .ar{font-size:12px}
+
+.route{border:1px solid var(--line);background:var(--bg-raise);padding:18px}
+.route-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:14px}
+.route-line{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.route-line .pip{width:9px;height:9px;border:1.5px solid var(--ink);flex:none}
+.route-line .pip.fill{background:var(--accent);border-color:var(--accent)}
+.route-line .yr{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);margin-left:auto;font-variant-numeric:tabular-nums}
+.route-line b{font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:700;font-size:15px;letter-spacing:-.01em}
+.route-conn{width:1.5px;height:16px;background:var(--line);margin-left:4px}
+.route-foot{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+
+/* ============ QUANTITIES ============ */
+.qty-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line-hard);border-left:1px solid var(--line)}
+@media(min-width:860px){.qty-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.qty{
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:22px 18px 20px;display:flex;flex-direction:column;gap:6px;
+  transition:background .2s;position:relative;
+}
+.qty::before{content:"";position:absolute;top:-1px;left:0;width:34px;height:2px;background:var(--accent)}
+.qty:hover{background:var(--bg-raise)}
+.qty .n{
+  font-family:var(--f-display);font-variation-settings:var(--xwide);
+  font-weight:800;font-size:clamp(32px,5vw,50px);
+  line-height:.94;letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+}
+.qty .l{font-size:13.5px;color:var(--ink-soft);line-height:1.45}
+.qty .src{margin-top:auto;padding-top:10px}
+
+/* ============ ABOUT ============ */
+.about-grid{display:grid;gap:clamp(26px,4vw,48px);grid-template-columns:1fr}
+@media(min-width:900px){.about-grid{grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr)}}
+.plate{border:1px solid var(--line);background:var(--bg-raise);padding:10px}
+.plate-img{position:relative;width:100%;aspect-ratio:4/5;background:var(--bg-sunk);overflow:hidden}
+.plate-img img{width:100%;height:100%;object-fit:cover;display:block}
+.plate-ph{
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:18px;
+  background:repeating-linear-gradient(45deg,transparent 0 9px,var(--line) 9px 10px);
+}
+.plate-ph .bx{border:1px dashed var(--ink-faint);padding:12px 14px;background:var(--bg-raise)}
+.plate-meta{display:flex;justify-content:space-between;gap:10px;padding-top:10px}
+
+.facts{border:1px solid var(--line);background:var(--bg-raise)}
+.about-grid .facts{margin-top:14px}
+.fact{display:flex;justify-content:space-between;gap:14px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.fact:last-child{border-bottom:none}
+.fact b{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:400}
+.fact span{text-align:right}
+
+.bio p{font-size:clamp(15.5px,1.5vw,17.5px);line-height:1.64;max-width:62ch;margin:0 0 17px}
+.bio p:last-of-type{margin-bottom:0}
+.bio strong{font-weight:600;box-shadow:inset 0 -.3em 0 var(--accent-soft)}
+
+.edu{margin-top:32px;border-top:1px solid var(--line-hard);padding-top:22px}
+.edu-h{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+.edu-h h3{margin:0;font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:800;font-size:clamp(18px,2.2vw,23px);letter-spacing:-.015em}
+.edu-h .when{margin-left:auto}
+.minors{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.minor{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:4px 9px}
+.minor.lead{border-color:var(--accent);color:var(--accent)}
+.courses{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.course{
+  font-size:13px;padding:6px 11px;border:1px solid var(--line);background:var(--bg-raise);
+  transition:transform .16s, border-color .16s;cursor:default;
+}
+.course:hover{transform:translateY(-2px);border-color:var(--accent)}
+
+/* ============ WORK LIST ============ */
+.filter-bar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  margin-bottom:24px;padding:11px 14px;border:1px solid var(--line);background:var(--bg-raise);
+}
+.filter-bar .st{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.filter-bar .chip{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);padding:4px 9px}
+.filter-bar .clr{text-decoration:underline;font-size:12.5px;margin-left:auto}
+.filter-bar .fb-other{font-size:12.5px;color:var(--accent);text-decoration:underline}
+.filter-bar .fb-other[hidden]{display:none}
+.filter-bar[hidden]{display:none}
+
+.jobs{border-top:1px solid var(--line-hard)}
+.grp{
+  margin:clamp(30px,4vw,46px) 0 12px;font-family:var(--f-mono);font-size:10.5px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);font-weight:400;
+}
+.grp:first-child{margin-top:0}
+.job{border-bottom:1px solid var(--line);transition:opacity .25s, background .25s}
+.job.dim{opacity:.3}
+.job.hit{background:var(--accent-soft)}
+.job-head{width:100%;text-align:left;display:grid;gap:4px 18px;grid-template-columns:1fr auto;padding:20px 4px 20px 0;align-items:start}
+.job-head:hover .role{color:var(--accent)}
+.role{grid-column:1;margin:0;font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:800;font-size:clamp(19px,2.7vw,28px);line-height:1.05;letter-spacing:-.02em;transition:color .16s}
+.org{grid-column:1;font-size:14.5px;color:var(--ink-soft)}
+.org .place::before{content:"\00a0\00b7\00a0"}
+.when-col{grid-column:2;grid-row:1/span 2;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.exp-open{width:24px;height:24px;border:1px solid var(--line);display:grid;place-items:center;position:relative;flex:none}
+.exp-open::before,.exp-open::after{content:"";position:absolute;background:var(--ink);transition:transform .22s, opacity .22s}
+.exp-open::before{width:10px;height:1.5px}
+.exp-open::after{width:1.5px;height:10px}
+.job.open .exp-open::after{transform:rotate(90deg);opacity:0}
+.job-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.3,.9,.3,1)}
+.job.open .job-body{grid-template-rows:1fr}
+.job-body>div{overflow:hidden}
+.job-inner{padding:0 0 22px;display:grid;gap:16px}
+@media(min-width:800px){.job-inner{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px 40px}}
+.job-inner ul{margin:0;padding-left:18px;display:grid;gap:8px}
+.job-inner li{font-size:15px;line-height:1.55}
+.job-inner li b{font-weight:600;color:var(--accent)}
+.tools{display:flex;flex-wrap:wrap;gap:6px;align-content:start}
+.tool{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);padding:4px 8px;background:var(--bg-raise);color:var(--ink-soft)}
+.tool.match{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.more{
+  grid-column:1/-1;display:inline-flex;align-items:center;gap:8px;justify-self:start;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);
+  padding-bottom:3px;transition:gap .18s;
+}
+.more:hover{gap:14px}
+
+/* ============ SKILLS ============ */
+.skill-hint{max-width:58ch;margin:0 0 24px;color:var(--ink-soft);font-size:15px}
+.skill-block{margin-bottom:28px}
+.skill-block h3{
+  margin:0 0 12px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink-faint);font-weight:400;display:flex;align-items:center;gap:12px;
+}
+.skill-block h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.skills{display:flex;flex-wrap:wrap;gap:8px}
+.sk{
+  border:1px solid var(--line-hard);background:var(--bg-raise);padding:9px 13px;
+  font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:600;font-size:14px;
+  display:inline-flex;align-items:center;gap:9px;
+  transition:transform .16s, background .16s, color .16s, border-color .16s;
+}
+.sk[data-tool]{cursor:pointer}
+.sk[data-tool]:hover{transform:translateY(-2px);border-color:var(--accent);color:var(--accent)}
+.sk .ct{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);border-left:1px solid var(--line);padding-left:8px}
+.sk.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);transform:translateY(-2px)}
+.sk.on .ct{color:var(--on-accent);opacity:.75;border-color:currentColor}
+.sk.static{border-style:dashed;border-color:var(--line);font-weight:500;color:var(--ink-soft)}
+
+/* ============ LANGUAGES ============ */
+.lang-wrap{display:grid;gap:clamp(24px,4vw,44px);grid-template-columns:1fr}
+@media(min-width:820px){.lang-wrap{grid-template-columns:minmax(0,1fr) minmax(250px,.8fr)}}
+.greet{
+  font-family:var(--f-display);font-variation-settings:var(--xwide);
+  font-weight:800;font-size:clamp(40px,7.4vw,88px);
+  line-height:.92;letter-spacing:-.03em;margin:0;min-height:.92em;color:var(--accent);
+}
+.greet.flip{animation:flip .4s cubic-bezier(.2,.9,.3,1)}
+@keyframes flip{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
+.greet-sub{margin:14px 0 0;color:var(--ink-soft);font-size:15.5px}
+.langs{display:grid;border-top:1px solid var(--line)}
+.lg{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:13px 6px;border-bottom:1px solid var(--line);transition:padding-left .18s, background .18s}
+.lg:hover,.lg.on{padding-left:13px;background:var(--bg-raise)}
+.lg .nm{font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:700;font-size:16.5px}
+.lg .lv{margin-left:auto;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.lg .bar{width:42px;height:5px;background:var(--bg-sunk);flex:none;border:1px solid var(--line)}
+.lg .bar i{display:block;height:100%;background:var(--accent)}
+.lg.on .nm{color:var(--accent)}
+
+/* ============ CONTACT ============ */
+.contact{border-top:1px solid var(--line-hard);background:var(--bg-sunk);margin-top:clamp(36px,5vw,72px)}
+.contact h2{
+  margin:0;font-family:var(--f-display);font-variation-settings:var(--xwide);
+  font-weight:800;font-size:clamp(32px,6.4vw,74px);line-height:.94;letter-spacing:-.03em;
+  text-transform:uppercase;text-wrap:balance;
+}
+.contact .sub{margin:18px 0 0;font-size:clamp(15.5px,1.9vw,19px);max-width:48ch;color:var(--ink-soft)}
+.contact-list{display:grid;margin-top:34px;border-top:1px solid var(--line)}
+.cl{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;text-align:left;
+  padding:15px 6px;border-bottom:1px solid var(--line);text-decoration:none;
+  transition:padding-left .18s, background .18s;
+}
+.cl:hover{padding-left:13px;background:var(--bg-raise)}
+.cl .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);width:100px;flex:none}
+.cl .v{font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:700;font-size:clamp(15.5px,2vw,20px);letter-spacing:-.012em;word-break:break-word}
+.cl .go{margin-left:auto;font-family:var(--f-mono);font-size:14px;color:var(--ink-faint);transition:transform .18s, color .18s}
+.cl:hover .go{transform:translateX(5px);color:var(--accent)}
+
+footer{padding:24px 0 38px;display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center}
+footer .push{margin-left:auto}
+
+/* ============ TEASER ============ */
+.teaser{border-top:1px solid var(--line-hard)}
+.tz{
+  display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap;
+  padding:15px 6px;border-bottom:1px solid var(--line);text-decoration:none;
+  transition:padding-left .18s, background .18s;
+}
+.tz:hover{padding-left:13px;background:var(--bg-raise)}
+.tz .r{font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:700;font-size:clamp(16px,2vw,20px);letter-spacing:-.015em;transition:color .16s}
+.tz:hover .r{color:var(--accent)}
+.tz .o{font-size:14px;color:var(--ink-soft)}
+.tz .d{margin-left:auto;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+.go-exp{margin-top:26px}
+
+/* ============ ROUTED PAGES ============ */
+#experience,#volunteer,#projects,#detail{display:none}
+body[data-view="experience"] #experience{display:block}
+body[data-view="volunteer"] #volunteer{display:block}
+body[data-view="projects"] #projects{display:block}
+body[data-view="detail"] #detail{display:block}
+body:not([data-view="home"]) #home{display:none}
+body:not([data-view="home"]) .rail{display:none}
+@media(min-width:1120px){body:not([data-view="home"]) .shell{padding-left:0}}
+
+/* wave transition between pages */
+.veil{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:repeat(6,1fr);pointer-events:none}
+.veil i{background:var(--accent);transform:translateY(101%);transition:transform .44s cubic-bezier(.76,0,.24,1)}
+.veil i:nth-child(1){transition-delay:0ms}
+.veil i:nth-child(2){transition-delay:48ms}
+.veil i:nth-child(3){transition-delay:96ms}
+.veil i:nth-child(4){transition-delay:144ms}
+.veil i:nth-child(5){transition-delay:192ms}
+.veil i:nth-child(6){transition-delay:240ms}
+.veil.cover i{transform:translateY(0)}
+.veil.cover.clear i{transform:translateY(-101%)}
+.veil.instant i{transition:none}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-top:4px}
+.gal-fig{margin:0;cursor:zoom-in;border:1px solid var(--line);background:var(--bg-raise);padding:6px;
+  transition:border-color .16s,transform .16s}
+.gal-fig:hover{border-color:var(--accent);transform:translateY(-2px)}
+.gal-fig img{width:100%;height:108px;object-fit:cover;display:block;background:#fff}
+.gal-fig figcaption{margin-top:6px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-faint);line-height:1.4}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(8,10,12,.95);display:none;
+  align-items:center;justify-content:center;padding:34px 28px 54px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:86vh;object-fit:contain;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.lb .cap{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:var(--f-mono);
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#cfd5da}
+.lb .x{position:absolute;top:12px;right:18px;color:#cfd5da;font-size:26px;line-height:1;
+  background:none;border:0;cursor:pointer;font-family:var(--f-mono)}
+.deck-open{display:flex;align-items:center;gap:10px;margin-top:6px;padding:11px 15px;
+  border:1px solid var(--line-hard);background:var(--bg-raise);cursor:pointer;width:100%;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink);transition:border-color .16s,background .16s}
+.deck-open:hover{border-color:var(--accent);background:var(--accent-soft)}
+.deck-open .pv{width:76px;height:44px;object-fit:cover;border:1px solid var(--line);background:#fff}
+.deck-open .go{margin-left:auto;color:var(--accent)}
+.deck{position:fixed;inset:0;z-index:90;background:rgba(8,10,12,.96);display:none;
+  align-items:center;justify-content:center;padding:26px 70px 58px}
+.deck.on{display:flex}
+.deck img{max-width:100%;max-height:84vh;object-fit:contain;background:#fff;
+  box-shadow:0 22px 64px rgba(0,0,0,.6)}
+.deck .nav{position:absolute;top:50%;transform:translateY(-50%);background:none;border:0;
+  color:#cfd5da;font-size:36px;line-height:1;cursor:pointer;padding:16px;font-family:var(--f-mono)}
+.deck .nav:hover{color:#fff}
+.deck .nav.prev{left:8px} .deck .nav.next{right:8px}
+.deck .x{position:absolute;top:12px;right:18px;background:none;border:0;color:#cfd5da;
+  font-size:26px;line-height:1;cursor:pointer;font-family:var(--f-mono)}
+.deck .count{position:absolute;bottom:18px;left:0;right:0;text-align:center;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;color:#cfd5da}
+.page-in{animation:pagein .5s .06s cubic-bezier(.2,.7,.3,1) both}
+@keyframes pagein{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.dt{padding-top:clamp(28px,4vw,52px);padding-bottom:clamp(48px,7vw,96px)}
+.back{
+  display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-bottom:1px solid var(--line);padding-bottom:4px;
+  transition:gap .18s, color .18s;
+}
+.back:hover{gap:15px;color:var(--accent)}
+.dt-head{margin-top:clamp(26px,4vw,44px);border-bottom:1px solid var(--line-hard);padding-bottom:22px}
+.dt-eyebrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:14px}
+.dt-eyebrow .org{font-family:var(--f-mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+.dt h1{
+  margin:0;font-family:var(--f-display);font-variation-settings:var(--xwide);
+  font-weight:800;font-size:clamp(30px,5.6vw,62px);line-height:.98;letter-spacing:-.03em;text-wrap:balance;
+}
+.dt-lede{margin:18px 0 0;font-size:clamp(17px,2.1vw,22px);line-height:1.42;max-width:36ch;color:var(--ink-soft);font-weight:500}
+.dt-grid{display:grid;gap:clamp(26px,4vw,52px);grid-template-columns:1fr;margin-top:clamp(28px,4vw,44px)}
+@media(min-width:880px){.dt-grid{grid-template-columns:minmax(0,1.45fr) minmax(240px,.75fr)}}
+.dt-sec{margin-bottom:30px}
+.dt-sec:last-child{margin-bottom:0}
+.dt-sec h3{
+  margin:0 0 14px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink-faint);font-weight:400;display:flex;align-items:center;gap:12px;
+}
+.dt-sec h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.dt-sec ul{margin:0;padding-left:18px;display:grid;gap:11px}
+.dt-sec li{font-size:16px;line-height:1.58}
+.dt-sec li b{font-weight:600;color:var(--accent)}
+.dt-sec p{margin:0 0 14px;font-size:16px;line-height:1.62;max-width:62ch}
+.nextprev{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:clamp(36px,5vw,64px);border-top:1px solid var(--line);padding-top:20px}
+.np{display:inline-flex;flex-direction:column;gap:5px;text-decoration:none;max-width:46%}
+.np.r{text-align:right;margin-left:auto}
+.np .lb{font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint)}
+.np .tt{font-family:var(--f-display);font-variation-settings:var(--wide);font-weight:700;font-size:16px;letter-spacing:-.012em;transition:color .16s}
+.np:hover .tt{color:var(--accent)}
+
+/* ============ REVEAL ============ */
+.js-motion .rv{opacity:0;transform:translateY(20px)}
+.js-motion .rv.in{opacity:1;transform:none;transition:opacity .55s cubic-bezier(.2,.7,.3,1),transform .55s cubic-bezier(.2,.7,.3,1)}
+.js-motion .rv.d1.in{transition-delay:.07s}
+.js-motion .rv.d2.in{transition-delay:.14s}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-delay:0 !important;transition-duration:.001ms !important}
+  .js-motion .rv{opacity:1;transform:none}
+  .js-motion .name .c{transform:none}
+}
+</style>
+
+<div id="gridbg" aria-hidden="true"></div>
+<div class="veil" id="veil" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="deck" id="deck" aria-hidden="true">
+  <button class="x" id="deckClose" aria-label="Close">&times;</button>
+  <button class="nav prev" id="deckPrev" aria-label="Previous slide">&larr;</button>
+  <img id="deckImg" alt="">
+  <button class="nav next" id="deckNext" aria-label="Next slide">&rarr;</button>
+  <div class="count" id="deckCount"></div>
+</div>
+<div class="lb" id="lightbox" aria-hidden="true">
+  <button class="x" id="lbClose" aria-label="Close">&times;</button>
+  <img id="lbImg" alt=""><div class="cap" id="lbCap"></div>
+</div>
+
+<nav class="rail" aria-label="Page progress">
+  <div class="rail-cap top">Progress</div>
+  <div class="rail-readout" id="railSta">0%</div>
+  <div class="rail-ticks" id="railTicks"></div>
+  <div class="rail-track"><div class="rail-fill" id="railFill"></div></div>
+  <div class="rail-head" id="railHead"></div>
+  <div class="rail-nav" id="railNav"></div>
+</nav>
+
+<div class="shell">
+<div id="home">
+
+<!-- ================= HERO ================= -->
+<header class="hero wrap" id="top">
+  <div class="hero-top">
+    <span class="dot" aria-hidden="true"></span>
+    <span class="mono">Open to Summer 2027 internships &amp; PEY placements</span>
+    <span class="mono push">Toronto, ON</span>
+  </div>
+
+  <h1 class="name" id="name" aria-label="Nirvaan Shah"></h1>
+
+  <div class="dimline" aria-hidden="true">
+    <span class="end"></span><span class="bar l"></span>
+    <span class="txt">Civil Engineering &middot; U of T &middot; B.A.Sc. 2029 with PEY</span>
+    <span class="bar r"></span><span class="end"></span>
+  </div>
+
+  <div class="hero-grid">
+    <div>
+      <p class="lede rv">
+        Third-year civil engineering at the University of Toronto. Power-grid modelling at
+        <span class="b">Evardi</span>, environmental compliance in <span class="b">Germany</span>,
+        engineering design in <span class="b">Kenya</span> &mdash; plus teams led across solar,
+        plastic recycling and STEM education.
+      </p>
+      <div class="cta-row rv d1">
+        <button class="btn solid" id="resumeBtn"><span class="ar" aria-hidden="true">&darr;</span> Download r&eacute;sum&eacute;</button>
+        <a class="btn" href="#work"><span class="ar" aria-hidden="true">&rarr;</span> See the work</a>
+        <a class="btn" href="mailto:nirvaanshah2006@gmail.com"><span class="ar" aria-hidden="true">&#9993;</span> Email me</a>
+        <a class="btn" href="https://www.linkedin.com/in/nirvaanshah/" target="_blank" rel="noopener"><span class="ar" aria-hidden="true">&#8599;</span> LinkedIn</a>
+      </div>
+    </div>
+
+    <aside class="route rv d2" aria-label="Where I have lived">
+      <div class="route-h"><span class="mono">Where I&rsquo;ve lived</span><span class="mono">2006 &rarr; now</span></div>
+      <div class="route-line"><span class="pip"></span><b>Nairobi, Kenya</b><span class="yr">2006&ndash;10</span></div>
+      <div class="route-conn"></div>
+      <div class="route-line"><span class="pip"></span><b>Singapore</b><span class="yr">2010&ndash;15</span></div>
+      <div class="route-conn"></div>
+      <div class="route-line"><span class="pip"></span><b>Nairobi, Kenya</b><span class="yr">2015&ndash;24</span></div>
+      <div class="route-conn"></div>
+      <div class="route-line"><span class="pip fill"></span><b>Toronto, Canada</b><span class="yr">2024&ndash;</span></div>
+      <div class="route-foot"><span class="mono">Fluent in English and Swahili</span></div>
+    </aside>
+  </div>
+</header>
+
+<!-- ================= QUANTITIES ================= -->
+<section class="wrap" id="numbers">
+  <div class="sheet-label rv">
+    <span class="tag">Impact</span>
+    <h2>By the numbers</h2>
+    <span class="note mono">All figures from work I led</span>
+  </div>
+  <div class="qty-grid rv d1">
+    <div class="qty"><span class="n" data-to="10000" data-comma="1" data-post="+">0</span><span class="l">students reached at the Drop &amp; Dash Tech Challenge</span><span class="src mono">The Tech Interactive, 2025</span></div>
+    <div class="qty"><span class="n" data-to="1171" data-comma="1">0</span><span class="l">tonnes of CO&#8322; saved by the microgrid design</span><span class="src mono">MonoSolar, U of T</span></div>
+    <div class="qty"><span class="n" data-to="50000" data-pre="$" data-comma="1">$0</span><span class="l">secured in funding and sponsorships</span><span class="src mono">Still I Rise</span></div>
+    <div class="qty"><span class="n" data-to="80">0</span><span class="l">local residents employed across four workshops</span><span class="src mono">Plastiki Rafiki</span></div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="wrap" id="about">
+  <div class="sheet-label rv">
+    <span class="tag">About</span>
+    <h2>Background</h2>
+    <span class="note mono">Updated September 2026</span>
+  </div>
+
+  <div class="about-grid">
+    <div class="rv">
+      <figure class="plate" style="margin:0">
+        <div class="plate-img">
+          <img id="photo" alt="Nirvaan Shah" hidden>
+          <div class="plate-ph" id="photoPh">
+            <div class="bx"><div class="mono" style="color:var(--ink-soft)">Photo</div><div class="mono" style="margin-top:4px">Coming soon</div></div>
+          </div>
+        </div>
+        <figcaption class="plate-meta"><span class="mono">Nirvaan Shah</span><span class="mono">Toronto</span></figcaption>
+      </figure>
+      <div class="facts">
+        <div class="fact"><b>Program</b><span>Civil Engineering</span></div>
+        <div class="fact"><b>School</b><span>University of Toronto</span></div>
+        <div class="fact"><b>Grad</b><span>2029</span></div>
+        <div class="fact"><b>Base</b><span>Toronto, ON</span></div>
+        <div class="fact"><b>Certified</b><span>Red Cross First Aid</span></div>
+      </div>
+    </div>
+
+    <div class="bio rv d1">
+      <p>I was born in Kenya in 2006, spent five years in Singapore as a child, and grew up in
+      Nairobi from 2015, finishing the IB at the International School of Kenya. Most of my early
+      hands-on experience came from there: I led a 22-member student NGO making products out of
+      recycled plastic, and <strong>set up four production workshops that created paid work for local
+      residents.</strong></p>
+
+      <p>I&rsquo;m now at the University of Toronto studying civil engineering with a Professional
+      Experience Year, plus minors in engineering business and environmental engineering. Those overlap
+      on the questions I find most interesting: <strong>how you build something that lasts, how it gets
+      paid for, and what it costs environmentally.</strong></p>
+
+      <p>Last summer I worked at Testo in Lenzkirch, Germany, leading four interns through an audit of
+      thirty hazardous material and gas work areas and costing out the compliance options. Alongside
+      term I now work remotely at Evardi, building <strong>power-grid network models across three utility
+      systems</strong> and writing optimization and machine-learning code in Python over fifty thousand
+      system measurements. <strong>That&rsquo;s the direction I want to keep going: environmental
+      engineering, energy systems and consulting.</strong></p>
+
+      <div class="edu">
+        <div class="edu-h"><h3>University of Toronto</h3><span class="mono when">2024 &mdash; Expected 2029</span></div>
+        <div class="minors">
+          <span class="minor lead">B.A.Sc. Civil Engineering, with PEY</span>
+          <span class="minor">Third year</span>
+          <span class="minor">Minor &middot; Engineering Business</span>
+          <span class="minor">Minor &middot; Environmental Engineering</span>
+        </div>
+        <p class="mono" style="margin:20px 0 0">Coursework</p>
+        <div class="courses">
+          <span class="course">Solid Mechanics</span>
+          <span class="course">Structural Analysis</span>
+          <span class="course">Steel and Timber Design</span>
+          <span class="course">Reinforced Concrete</span>
+          <span class="course">Geotechnical Engineering</span>
+          <span class="course">Fluid Mechanics</span>
+          <span class="course">Water and Wastewater Treatment Processes</span>
+          <span class="course">Municipal Engineering</span>
+          <span class="course">Sustainable Energy Systems</span>
+          <span class="course">Building Science</span>
+          <span class="course">Transport</span>
+          <span class="course">Management of Construction</span>
+          <span class="course">Engineering Economics and Decision Making</span>
+          <span class="course">Fundamentals of Accounting and Finance</span>
+          <span class="course">People Management &amp; Organizational Behaviour</span>
+          <span class="course">Python Computer Programming</span>
+          <span class="course">Civil Engineering Graphics</span>
+        </div>
+
+        <div class="edu-h" style="margin-top:28px"><h3>International School of Kenya</h3><span class="mono when">Aug 2021 &mdash; May 2024</span></div>
+        <div class="minors">
+          <span class="minor">High School Diploma</span>
+          <span class="minor">International Baccalaureate Diploma</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ENGINEERING TEASER ================= -->
+<section class="wrap" id="work">
+  <div class="sheet-label rv">
+    <span class="tag">Experience</span>
+    <h2>Engineering experience</h2>
+    <span class="note mono">Germany &middot; Canada &middot; Kenya</span>
+  </div>
+  <div class="teaser rv d1" id="teaserEng"></div>
+  <a class="btn solid go-exp" href="#/experience"><span class="ar" aria-hidden="true">&rarr;</span> Open the experience page</a>
+</section>
+
+<!-- ================= VOLUNTEER TEASER ================= -->
+<section class="wrap" id="volunteering">
+  <div class="sheet-label rv">
+    <span class="tag">Volunteering</span>
+    <h2>Leadership and volunteering</h2>
+    <span class="note mono">Nairobi &middot; Toronto</span>
+  </div>
+  <div class="teaser rv d1" id="teaserVol"></div>
+  <a class="btn solid go-exp" href="#/volunteer"><span class="ar" aria-hidden="true">&rarr;</span> Open the volunteering page</a>
+</section>
+
+<!-- ================= TECHNICAL PROJECTS TEASER ================= -->
+<section class="wrap" id="technical">
+  <div class="sheet-label rv">
+    <span class="tag">Technical</span>
+    <h2>Technical projects</h2>
+    <span class="note mono">University of Toronto</span>
+  </div>
+  <div class="teaser rv d1" id="teaserTech"></div>
+  <a class="btn solid go-exp" href="#/projects"><span class="ar" aria-hidden="true">&rarr;</span> Open the technical projects page</a>
+</section>
+
+<!-- ================= SKILLS ================= -->
+<section class="wrap" id="skills">
+  <div class="sheet-label rv">
+    <span class="tag">Skills</span>
+    <h2>Tools and software</h2>
+    <span class="note mono">Click one to filter</span>
+  </div>
+
+  <p class="skill-hint rv">Each skill is linked to the roles where I actually used it. Click one to open
+  the matching page filtered to it; the number is how many roles it appears in. Unnumbered items are from
+  coursework and certification rather than a specific role.</p>
+
+  <div class="skill-block rv d1">
+    <h3>Design &amp; modelling</h3>
+    <div class="skills">
+      <button class="sk" data-tool="autocad">AutoCAD <span class="ct"></span></button>
+      <button class="sk" data-tool="revit">Revit <span class="ct"></span></button>
+      <button class="sk" data-tool="solidworks">SOLIDWORKS <span class="ct"></span></button>
+      <button class="sk" data-tool="rhino">Rhino <span class="ct"></span></button>
+      <button class="sk" data-tool="fusion">Fusion 360 <span class="ct"></span></button>
+      <button class="sk" data-tool="sketchup">SketchUp <span class="ct"></span></button>
+      <button class="sk" data-tool="blender">Blender <span class="ct"></span></button>
+      <button class="sk" data-tool="illustrator">Adobe Illustrator <span class="ct"></span></button>
+      <button class="sk" data-tool="photoshop">Adobe Photoshop <span class="ct"></span></button>
+    </div>
+  </div>
+
+  <div class="skill-block rv d1">
+    <h3>Programming &amp; data</h3>
+    <div class="skills">
+      <button class="sk" data-tool="python">Python <span class="ct"></span></button>
+      <button class="sk" data-tool="excel">Excel (VBA, Power Query) <span class="ct"></span></button>
+      <button class="sk" data-tool="optimization">Optimization Modelling <span class="ct"></span></button>
+      <button class="sk" data-tool="ml">Machine Learning <span class="ct"></span></button>
+      <button class="sk" data-tool="dataanalysis">Data Analysis <span class="ct"></span></button>
+      <button class="sk" data-tool="matlab">MATLAB <span class="ct"></span></button>
+    </div>
+  </div>
+
+  <div class="skill-block rv d1">
+    <h3>Engineering analysis</h3>
+    <div class="skills">
+      <button class="sk" data-tool="powersystems">Power Systems Modelling <span class="ct"></span></button>
+      <button class="sk" data-tool="energymodel">Energy Yield Modelling <span class="ct"></span></button>
+      <button class="sk" data-tool="costanalysis">Cost Analysis <span class="ct"></span></button>
+      <button class="sk" data-tool="bim">BIM Modelling <span class="ct"></span></button>
+      <button class="sk" data-tool="rsmeans">RSMeans <span class="ct"></span></button>
+      <button class="sk" data-tool="mocap">Motion Capture <span class="ct"></span></button>
+      <button class="sk" data-tool="reba">Ergonomic Analysis (REBA) <span class="ct"></span></button>
+      <button class="sk" data-tool="arcgis">ArcGIS <span class="ct"></span></button>
+      <button class="sk" data-tool="hechms">HEC-HMS <span class="ct"></span></button>
+      <button class="sk" data-tool="hydrology">Hydrological Modelling <span class="ct"></span></button>
+      <button class="sk" data-tool="watershed">Watershed Delineation <span class="ct"></span></button>
+      <button class="sk" data-tool="etabs">ETABS <span class="ct"></span></button>
+      <button class="sk" data-tool="surveying">Surveying Instrumentation <span class="ct"></span></button>
+    </div>
+  </div>
+
+  <div class="skill-block rv d2">
+    <h3>Environmental &amp; compliance</h3>
+    <div class="skills">
+      <button class="sk" data-tool="envcompliance">Environmental Compliance <span class="ct"></span></button>
+      <button class="sk" data-tool="hazmat">Hazardous Material Analysis <span class="ct"></span></button>
+      <button class="sk" data-tool="regresearch">Regulatory Research <span class="ct"></span></button>
+      <button class="sk" data-tool="processopt">Process Optimization <span class="ct"></span></button>
+      <button class="sk" data-tool="wastewater">Wastewater Systems <span class="ct"></span></button>
+      <button class="sk" data-tool="circulareconomy">Circular Economy <span class="ct"></span></button>
+      <button class="sk" data-tool="urbanmetabolism">Urban Metabolism <span class="ct"></span></button>
+    </div>
+  </div>
+
+  <div class="skill-block rv d2">
+    <h3>Fabrication</h3>
+    <div class="skills">
+      <button class="sk" data-tool="laser">Laser Cutting <span class="ct"></span></button>
+      <button class="sk" data-tool="3dprint">3D Printing <span class="ct"></span></button>
+      <button class="sk" data-tool="resin">Resin Molding <span class="ct"></span></button>
+      <button class="sk" data-tool="extrusion">Plastic Shredding &amp; Extrusion <span class="ct"></span></button>
+      <button class="sk" data-tool="powertools">Power Tools <span class="ct"></span></button>
+      <button class="sk" data-tool="cnc">CNC Machining <span class="ct"></span></button>
+      <button class="sk" data-tool="welding">Welding <span class="ct"></span></button>
+    </div>
+  </div>
+
+  <div class="skill-block rv d2">
+    <h3>Outreach &amp; leadership</h3>
+    <div class="skills">
+      <button class="sk" data-tool="teaching">STEM Teaching <span class="ct"></span></button>
+      <button class="sk" data-tool="mentoring">Mentoring <span class="ct"></span></button>
+      <button class="sk" data-tool="fundraising">Fundraising <span class="ct"></span></button>
+      <button class="sk" data-tool="orgbehaviour">Organizational Behaviour <span class="ct"></span></button>
+      <button class="sk" data-tool="peoplemgmt">People Management <span class="ct"></span></button>
+    </div>
+  </div>
+
+  <div class="skill-block rv d2">
+    <h3>Certifications</h3>
+    <div class="skills">
+      <span class="sk static">Red Cross First Aid</span>
+      <span class="sk static">International Driver&rsquo;s Licence</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= LANGUAGES ================= -->
+<section class="wrap" id="languages">
+  <div class="sheet-label rv">
+    <span class="tag">Languages</span>
+    <h2>Two languages, both fluent</h2>
+    <span class="note mono">Select one</span>
+  </div>
+  <div class="lang-wrap">
+    <div class="rv">
+      <p class="greet" id="greet">Habari</p>
+      <p class="greet-sub" id="greetSub">Swahili &mdash; fluent. Spoken daily growing up in Nairobi.</p>
+    </div>
+    <div class="langs rv d1" id="langs">
+      <button class="lg" data-g="Hello" data-note="English &mdash; fluent. My language of instruction throughout school and university.">
+        <span class="bar"><i style="width:100%"></i></span><span class="nm">English</span><span class="lv">Fluent</span></button>
+      <button class="lg on" data-g="Habari" data-note="Swahili &mdash; fluent. Spoken daily growing up in Nairobi.">
+        <span class="bar"><i style="width:100%"></i></span><span class="nm">Swahili</span><span class="lv">Fluent</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="rv">
+      <h2>Get in touch</h2>
+      <p class="sub">I&rsquo;m looking for internship and PEY opportunities in environmental
+      engineering, sustainability and consulting. Email is the fastest way to reach me.</p>
+    </div>
+    <div class="contact-list rv d1">
+      <a class="cl" href="mailto:nirvaanshah2006@gmail.com"><span class="k">Email</span><span class="v">nirvaanshah2006@gmail.com</span><span class="go" aria-hidden="true">&rarr;</span></a>
+      <a class="cl" href="tel:+14378760584"><span class="k">Phone</span><span class="v">(437) 876-0584</span><span class="go" aria-hidden="true">&rarr;</span></a>
+      <a class="cl" href="https://www.linkedin.com/in/nirvaanshah/" target="_blank" rel="noopener"><span class="k">LinkedIn</span><span class="v">linkedin.com/in/nirvaanshah</span><span class="go" aria-hidden="true">&rarr;</span></a>
+      <button class="cl" id="resumeBtn2" style="width:100%"><span class="k">R&eacute;sum&eacute;</span><span class="v">Download the r&eacute;sum&eacute; (PDF)</span><span class="go" aria-hidden="true">&darr;</span></button>
+    </div>
+    <footer>
+      <span class="mono">Nirvaan Shah &mdash; Toronto, ON</span>
+      <span class="mono push"><a href="#top" style="text-decoration:none">&uarr; Back to top</a></span>
+    </footer>
+  </div>
+</section>
+
+</div><!-- /#home -->
+
+<div id="experience"></div>
+<div id="volunteer"></div>
+<div id="projects"></div>
+
+<div id="detail"><div class="wrap dt" id="detailBody"></div></div>
+
+</div><!-- /.shell -->
+
+<script id="resumeData" type="text/plain"></script>
+
+<script id="galleryData" type="application/json">{"bim-cost-estimation":[{"cap":"Assembly vs unit-cost decision matrix","src":"images/g_bim-cost-estimation_01.jpg"},{"cap":"Decision matrix \u2014 floor families","src":"images/g_bim-cost-estimation_02.jpg"},{"cap":"Decision matrix \u2014 openings","src":"images/g_bim-cost-estimation_03.jpg"},{"cap":"Decision matrix \u2014 openings","src":"images/g_bim-cost-estimation_04.jpg"},{"cap":"Decision matrix \u2014 roof build-up","src":"images/g_bim-cost-estimation_05.jpg"},{"cap":"Executive summary \u2014 trade cost breakdown","src":"images/g_bim-cost-estimation_06.jpg"}],"ergonomics-mocap":[{"cap":"Neutral posture \u2014 reach, frame 0","src":"images/g_ergonomics-mocap_01.jpg"},{"cap":"Neutral posture \u2014 grasp","src":"images/g_ergonomics-mocap_02.jpg"},{"cap":"High-strain floor lift","src":"images/g_ergonomics-mocap_03.jpg"},{"cap":"High-strain lift \u2014 deep hip hinge","src":"images/g_ergonomics-mocap_04.jpg"},{"cap":"Mobile lift assists considered","src":"images/g_ergonomics-mocap_05.jpg"},{"cap":"Elevated staging area concept","src":"images/g_ergonomics-mocap_06.jpg"}],"esp-renewable":[{"cap":"MonoSolar array siting","src":"images/g_esp-renewable_01.jpg"},{"cap":"Panel layout across campus roofs","src":"images/g_esp-renewable_02.jpg"},{"cap":"Array detail","src":"images/g_esp-renewable_03.jpg"},{"cap":"Panel assembly","src":"images/g_esp-renewable_04.jpg"},{"cap":"Structural model","src":"images/g_esp-renewable_05.jpg"},{"cap":"Modelled annual generation","src":"images/g_esp-renewable_06.jpg"}],"hec-bear-creek":[{"cap":"Modelling workflow \u2014 14 steps","src":"images/g_hec-bear-creek_01.jpg"},{"cap":"DEM and gauge break points in ArcGIS","src":"images/g_hec-bear-creek_02.jpg"},{"cap":"Delineated subbasins in HEC-HMS","src":"images/g_hec-bear-creek_03.jpg"},{"cap":"Initial run \u2014 predicted vs observed discharge","src":"images/g_hec-bear-creek_04.jpg"},{"cap":"Calibrated run \u2014 corrected peak and baseflow","src":"images/g_hec-bear-creek_05.jpg"}],"fontas-watershed":[{"cap":"Fontas River within the Mackenzie basin","src":"images/g_fontas-watershed_01.jpg"},{"cap":"Delineation workflow","src":"images/g_fontas-watershed_02.jpg"},{"cap":"Delineated watershed boundary","src":"images/g_fontas-watershed_03.jpg"},{"cap":"Topographic contour map \u2014 ArcGIS","src":"images/g_fontas-watershed_04.jpg"},{"cap":"Contour comparison \u2014 iMapBC","src":"images/g_fontas-watershed_05.jpg"},{"cap":"Discharge record","src":"images/g_fontas-watershed_06.jpg"}],"urban-metabolism":[{"cap":"Nairobi input and output flow diagram","src":"images/g_urban-metabolism_01.jpg"},{"cap":"Dandora dumpsite","src":"images/g_urban-metabolism_02.jpg"},{"cap":"DEFAST decentralised treatment, Kampala","src":"images/g_urban-metabolism_03.jpg"}]}</script>
+<script id="slidesData" type="application/json">{"wastewater-reuse":[{"n":1,"src":"images/s_wastewater-reuse_01.jpg"},{"n":2,"src":"images/s_wastewater-reuse_02.jpg"},{"n":3,"src":"images/s_wastewater-reuse_03.jpg"},{"n":4,"src":"images/s_wastewater-reuse_04.jpg"},{"n":5,"src":"images/s_wastewater-reuse_05.jpg"},{"n":6,"src":"images/s_wastewater-reuse_06.jpg"},{"n":7,"src":"images/s_wastewater-reuse_07.jpg"},{"n":8,"src":"images/s_wastewater-reuse_08.jpg"},{"n":9,"src":"images/s_wastewater-reuse_09.jpg"},{"n":10,"src":"images/s_wastewater-reuse_10.jpg"},{"n":11,"src":"images/s_wastewater-reuse_11.jpg"},{"n":12,"src":"images/s_wastewater-reuse_12.jpg"},{"n":13,"src":"images/s_wastewater-reuse_13.jpg"},{"n":14,"src":"images/s_wastewater-reuse_14.jpg"},{"n":15,"src":"images/s_wastewater-reuse_15.jpg"},{"n":16,"src":"images/s_wastewater-reuse_16.jpg"}],"canada-post-ob":[{"n":1,"src":"images/s_canada-post-ob_01.jpg"},{"n":2,"src":"images/s_canada-post-ob_02.jpg"},{"n":3,"src":"images/s_canada-post-ob_03.jpg"},{"n":4,"src":"images/s_canada-post-ob_04.jpg"},{"n":5,"src":"images/s_canada-post-ob_05.jpg"},{"n":6,"src":"images/s_canada-post-ob_06.jpg"},{"n":7,"src":"images/s_canada-post-ob_07.jpg"},{"n":8,"src":"images/s_canada-post-ob_08.jpg"},{"n":9,"src":"images/s_canada-post-ob_09.jpg"},{"n":10,"src":"images/s_canada-post-ob_10.jpg"},{"n":11,"src":"images/s_canada-post-ob_11.jpg"},{"n":12,"src":"images/s_canada-post-ob_12.jpg"}]}</script>
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!reduce) document.documentElement.classList.add("js-motion");
+
+  var TOOL_NAMES = {
+    autocad:"AutoCAD", revit:"Revit", solidworks:"SOLIDWORKS", rhino:"Rhino",
+    fusion:"Fusion 360", sketchup:"SketchUp", blender:"Blender",
+    illustrator:"Adobe Illustrator",
+    python:"Python", excel:"Excel (VBA, Power Query)", optimization:"Optimization Modelling",
+    ml:"Machine Learning", dataanalysis:"Data Analysis",
+    powersystems:"Power Systems Modelling", energymodel:"Energy Yield Modelling",
+    costanalysis:"Cost Analysis",
+    envcompliance:"Environmental Compliance", hazmat:"Hazardous Material Analysis",
+    regresearch:"Regulatory Research", processopt:"Process Optimization",
+    laser:"Laser Cutting", "3dprint":"3D Printing", resin:"Resin Molding",
+    extrusion:"Plastic Shredding &amp; Extrusion", powertools:"Power Tools",
+    bim:"BIM Modelling", rsmeans:"RSMeans", mocap:"Motion Capture",
+    hechms:"HEC-HMS", hydrology:"Hydrological Modelling", watershed:"Watershed Delineation",
+    wastewater:"Wastewater Systems", circulareconomy:"Circular Economy",
+    urbanmetabolism:"Urban Metabolism",
+    orgbehaviour:"Organizational Behaviour", peoplemgmt:"People Management",
+    arcgis:"ArcGIS",
+    reba:"Ergonomic Analysis (REBA)",
+    matlab:"MATLAB", etabs:"ETABS", surveying:"Surveying Instrumentation",
+    cnc:"CNC Machining", welding:"Welding", photoshop:"Adobe Photoshop",
+    teaching:"STEM Teaching", mentoring:"Mentoring", fundraising:"Fundraising"
+  };
+
+  var GALLERY = {}, SLIDES = {};
+  try {
+    GALLERY = JSON.parse(document.getElementById("galleryData").textContent || "{}");
+  } catch(e){ GALLERY = {}; }
+  try {
+    SLIDES = JSON.parse(document.getElementById("slidesData").textContent || "{}");
+  } catch(e){ SLIDES = {}; }
+
+  /* Each entry drives both its row in the list and its own page at #/w/<id>.
+     To add detail later: extend `bullets`, or add `sections:[{title,body}]`. */
+  var PROJECTS = [
+    {
+      id:"evardi", group:"engineering",
+      role:"Engineering Project Analyst Intern",
+      org:"Evardi", place:"Remote", note:"Part-time alongside term",
+      dates:"Aug 2026 &mdash; Present",
+      lede:"Building power-grid network models and machine-learning tools for an energy software team.",
+      bullets:[
+        "Built and analyzed <b>power-grid network topology models</b> across 3 utility systems, mapping substations, lines, transformers and DERs to simulate power flows, contingencies and system reliability.",
+        "Developed <b>optimization and machine-learning models</b> in Python to analyze grid operating data, identify anomalies and evaluate control strategies across <b>50,000+</b> system measurements and scenarios."
+      ],
+      tools:["python","matlab","excel","powersystems","optimization","ml","dataanalysis"],
+      facts:[["Role","Project Analyst Intern"],["Utility systems","3"],["Data points","50,000+"],["Commitment","Part-time, remote"]]
+    },
+    {
+      id:"super-mileage", group:"engineering",
+      role:"Aerostructural Design Team Member",
+      org:"UTSM", place:"Toronto, ON",
+      dates:"Sep 2024 &mdash; Present",
+      lede:"Designing and building the body of a fuel-efficient vehicle for the Shell Eco-marathon.",
+      bullets:[
+        "Designed and fabricated <b>12 structural components</b> of a fuel-efficient vehicle body for the <b>Shell Eco-Marathon</b>, an international efficiency competition.",
+        "Modeled components in SOLIDWORKS and fabricated them with laser cutting, 3D printing and power tools, working within a <b>six-person team</b>."
+      ],
+      tools:["solidworks","autocad","sketchup","laser","cnc","welding","3dprint","powertools"],
+      facts:[["Role","Team member"],["Components","12"],["Team","6 people"],["Competition","Shell Eco-Marathon"]]
+    },
+    {
+      id:"testo", group:"engineering",
+      role:"Environmental Optimization and Supply Chain Intern",
+      org:"Testo", place:"Lenzkirch, Germany",
+      dates:"Jun &mdash; Aug 2026",
+      lede:"Environmental compliance auditing and cost analysis for a German measurement-technology manufacturer.",
+      bullets:[
+        "Evaluated <b>platinum filtration optimization</b> across 12 work areas and conducted a cost analysis of 5 compliance options spanning <b>&euro;12,000&ndash;&euro;30,000</b>, identifying a <b>15% recovery improvement</b> and recommending an approach that met requirements at <b>70%</b> of the highest-cost alternative.",
+        "Flagged a major environmental concern regarding platinum waste disposal.",
+        "Led a team of <b>4 interns</b> to audit <b>30</b> hazardous material and gas work areas covering <b>220 regulated substances</b> against government environmental requirements, identifying <b>45 compliance gaps</b> ahead of a regulatory inspection."
+      ],
+      tools:["envcompliance","hazmat","regresearch","costanalysis","processopt","excel","python"],
+      facts:[["Team led","4 interns"],["Areas audited","30"],["Substances","220"],["Gaps found","45"]]
+    },
+    {
+      id:"samir-consulting", group:"engineering",
+      role:"Engineering Consulting Intern",
+      org:"Samir Consulting", place:"Nairobi, Kenya",
+      dates:"Jun &mdash; Aug 2025",
+      lede:"Design work on a golf course resort development across a 110-hectare site.",
+      bullets:[
+        "Supported a <b>six-engineer team</b> at an engineering consultancy on the design of a golf course resort development across a <b>110 hectare</b> site.",
+        "Produced <b>four renderings and three designs</b> using AutoCAD, Fusion 360 and Revit."
+      ],
+      tools:["autocad","fusion","revit","etabs","surveying","illustrator","photoshop"],
+      facts:[["Role","Consulting Intern"],["Team","6 engineers"],["Site","110 hectares"],["Output","4 renderings, 3 designs"]]
+    },
+    {
+      id:"still-i-rise", group:"leadership",
+      role:"Founding Member and Advisor",
+      org:"Still I Rise", place:"Nairobi, Kenya",
+      dates:"Mar 2023 &mdash; Present",
+      lede:"Helping found the first free IB school in the Mathare slums, and still advising on outreach.",
+      bullets:[
+        "Founding member of the team that created the <b>first free IB school</b> in Mathare slums, Nairobi, over 18 months. Now an advisor supporting outreach for sponsors and fundraising.",
+        "Tutored <b>60 students</b> across four subjects &mdash; mathematics, physics, chemistry and Python &mdash; and helped secure <b>$50,000</b> in funding and sponsorships."
+      ],
+      tools:["python","teaching","fundraising"],
+      facts:[["Role","Founding member, now advisor"],["Students tutored","60"],["Funding secured","$50,000"],["Duration","18 months + advisory"]]
+    },
+    {
+      id:"tech-interactive", group:"leadership",
+      role:"Engineering Design Mentor",
+      org:"The Tech Interactive", place:"Nairobi, Kenya",
+      dates:"Aug 2025",
+      lede:"Mentoring 80 student teams at an engineering challenge reaching 10,000 students.",
+      bullets:[
+        "Supported the <b>Drop &amp; Dash Tech Challenge</b>, a hands-on engineering event for more than <b>10,000 students</b> across South and East Africa.",
+        "Mentored <b>80 teams</b> of 4 students each over the span of a week, building battery-free devices from locally sourced materials to simulate medical supply delivery in remote areas."
+      ],
+      tools:["mentoring","teaching"],
+      facts:[["Role","Design Mentor"],["Teams mentored","80"],["Students reached","10,000+"],["Duration","1 week"]]
+    },
+    {
+      id:"canada-post-ob", group:"technical",
+      role:"Canada Post &mdash; Organizational Behaviour Analysis",
+      org:"JRE420 People Management &amp; Organizational Behaviour", place:"University of Toronto",
+      dates:"2026",
+      lede:"Diagnosing motivation and burnout at Canada Post through organizational behaviour theory, then proposing two interventions.",
+      bullets:[
+        "Analysed Canada Post &mdash; <b>16 million addresses, 64,000 employees</b> &mdash; against a <b>$748M net loss</b> in FY2023, widened from $548M the year before as mail volumes shifted to parcels under gig-economy competition.",
+        "Diagnosed the first issue through <b>expectancy theory and operant learning</b>: a multiplicative motivation model where one failed factor collapses motivation entirely, and a reinforcement system that rewarded gaming the system over customer service.",
+        "Proposed <b>voluntary capped overtime</b> &mdash; weekly limits with an accessible sign-up and positive reinforcement &mdash; to restore fairness while controlling cost and fatigue.",
+        "Diagnosed the second issue with the <b>Job Demands&ndash;Resources model</b>, linking high volumes, deadlines and long hours to burnout and absenteeism, and proposed a five-stage <b>Protected Recovery System</b> piloted route by route."
+      ],
+      tools:["orgbehaviour","peoplemgmt","dataanalysis"],
+      facts:[["Course","JRE420 (Rotman)"],["Subject","Canada Post"],["Issues analysed","2"],["Recommendations","2"]]
+    },
+    {
+      id:"hec-bear-creek", group:"technical",
+      role:"Hydrological Modelling of Bear Creek",
+      org:"CIV250 Hydraulics and Hydrology", place:"University of Toronto",
+      dates:"Mar 2026",
+      lede:"Building and calibrating a HEC-HMS rainfall-runoff model of an Ontario watershed against gauged streamflow.",
+      bullets:[
+        "Delineated the <b>Bear Creek</b> watershed from an OpenTopography DEM in ArcGIS, projecting to UTM 17N and setting break points at two Water Survey of Canada gauges &mdash; Brigden (02GG009) and Petrolia (02GG006).",
+        "Configured the HEC-HMS basin with <b>SCS Curve Number</b> losses, a <b>Snyder unit hydrograph</b> transform, linear-reservoir baseflow, lag routing and a gridded temperature-index snowmelt model.",
+        "Drove the model with NASA gridded precipitation and temperature, simulating 1 August &ndash; 1 September 2023 around a major storm on <b>24&ndash;25 August</b>.",
+        "Calibrated against observed discharge by raising the Curve Number from <b>60 to 70</b> and cutting initial baseflow from <b>3 to 0.5 m&sup3;/s</b>, correcting an underestimated flood peak and an overestimated pre-storm baseflow."
+      ],
+      tools:["hechms","arcgis","hydrology","dataanalysis"],
+      facts:[["Course","CIV250 Hydraulics and Hydrology"],["Watershed","Bear Creek, Ontario"],["Gauges","2"],["Period","Aug&ndash;Sep 2023"]]
+    },
+    {
+      id:"fontas-watershed", group:"technical",
+      role:"Fontas River Watershed Delineation",
+      org:"CIV250 Hydraulics and Hydrology", place:"University of Toronto",
+      dates:"Feb 2026",
+      lede:"Delineating a 10,000 km&sup2; boreal watershed in ArcGIS Pro from a 30 m digital elevation model.",
+      bullets:[
+        "Processed a 30 m OpenTopography DEM of the <b>Fontas River</b> in northeastern British Columbia, projecting to UTM Zone 11N and filling sinks to produce a continuous flow surface.",
+        "Generated flow-direction and flow-accumulation rasters, reclassified the stream network and vectorised it, then placed a pour point at the confluence with the Sikanni Chief River.",
+        "Extracted a watershed polygon of <b>10,038.8 km&sup2;</b> with a <b>690.1 km</b> perimeter, against a published area of 9,324 km&sup2; &mdash; an overestimate of roughly 8%.",
+        "Cross-checked modelled elevation range (<b>343&ndash;1,061 m</b>) and outlet coordinates against BC government and iMapBC reference data."
+      ],
+      tools:["arcgis","watershed","hydrology","dataanalysis"],
+      facts:[["Course","CIV250 Hydraulics and Hydrology"],["Watershed","Fontas River, BC"],["Area","10,038.8 km&sup2;"],["Perimeter","690.1 km"]]
+    },
+    {
+      id:"ergonomics-mocap", group:"technical",
+      role:"Construction Ergonomics Motion Capture Study",
+      org:"CIV280 Management of Construction", place:"University of Toronto",
+      dates:"Dec 2025",
+      lede:"Measuring injury risk in construction lifting using motion capture and a Python joint-angle pipeline.",
+      bullets:[
+        "Recorded two manual material handling movements with <b>Rokoko Vision</b> motion capture on a dual-camera rig set 90&deg; apart, rendering the joint skeletons in Blender.",
+        "Wrote <b>Python</b> scripts to export joint coordinates frame by frame and compute trunk, neck, shoulder, hip and knee angles across the full motion.",
+        "Scored both movements with <b>REBA</b>: a neutral waist-height reach scored <b>4</b>, while a floor lift with <b>64.5&deg; trunk flexion</b> scored <b>10</b> &mdash; the high-risk band.",
+        "Recommended a mobile lift assist and an elevated staging area, each targeted at the trunk-angle term that drove the score."
+      ],
+      tools:["python","blender","mocap","reba","dataanalysis"],
+      facts:[["Course","CIV280 Management of Construction"],["Team","4 students"],["REBA scores","4 vs 10"],["Peak trunk angle","64.5&deg;"]]
+    },
+    {
+      id:"urban-metabolism", group:"technical",
+      role:"Nairobi Urban Metabolism Study",
+      org:"CIV220 Urban Engineering Ecology", place:"University of Toronto",
+      dates:"Nov 2025",
+      lede:"Quantifying a city of 5.8 million as a metabolism &mdash; what flows in, what leaks out, and where to close the loop.",
+      bullets:[
+        "Quantified Nairobi&rsquo;s resource flows across a city of <b>5.8 million growing 4.08% a year</b>: <b>22.7 GJ/person/year</b> of energy and <b>14.6 t/person/year</b> of clean water in, against <b>29 t/person/year</b> of wastewater out.",
+        "Identified the <b>Dandora dumpsite</b> as the largest metabolic sink &mdash; taking <b>850 of the 2,000&ndash;2,500 tonnes</b> the city discards daily, roughly half of it organic, with only <b>33%</b> of generated waste collected at all.",
+        "Proposed converting Dandora to <b>waste-to-energy</b> (up to 2,000 t/day yielding <b>45&ndash;60 MW</b>) and decentralised wastewater treatment on Kampala&rsquo;s DEFAST model, which removes <b>over 90%</b> of COD, BOD, TSS and pathogens &mdash; against a city where only 30% is sewer-connected and under 25% of wastewater is treated.",
+        "Assessed where the organism analogy holds and where it breaks: strong for locating bottlenecks, sinks and leakages alongside material flow analysis, but blind to politics, financing and social behaviour, since cities have no homeostasis."
+      ],
+      tools:["urbanmetabolism","circulareconomy","wastewater","dataanalysis"],
+      facts:[["Course","CIV220 Urban Engineering Ecology"],["City","Nairobi"],["Work","Individual report"],["Interventions","2"]]
+    },
+    {
+      id:"wastewater-reuse", group:"technical",
+      role:"Wastewater Reusability",
+      org:"CIV282 Engineering Communications", place:"University of Toronto",
+      dates:"Nov 2025",
+      lede:"Comparing municipal wastewater systems across four cities and arguing the case for closing the loop.",
+      bullets:[
+        "Compared wastewater systems in <b>Curitiba, Shanghai, Markham and Nairobi</b>, contrasting linear collect-treat-discharge models against circular resource recovery.",
+        "Quantified each case: <b>52 t/person/year</b> in Curitiba with 95% of treated sewage discharged to rivers, <b>69.28 t/person/year</b> in Shanghai where sludge drives <b>40%</b> of treatment emissions, and <b>233,000 t CO&#8322;e</b> projected for Markham&rsquo;s Duffin Creek plant.",
+        "Recommended anaerobic digestion and biogas recovery for Curitiba and Shanghai, and <b>non-potable water reuse</b> for Markham to cut its reliance on imported energy.",
+        "Built the framing argument that a well-designed city treats wastewater as raw material for industry rather than an output to dispose of."
+      ],
+      tools:["wastewater","circulareconomy","dataanalysis"],
+      facts:[["Course","CIV282 Engineering Communications"],["Team","5 students"],["Cities compared","4"],["Theme","Circular resource recovery"]]
+    },
+    {
+      id:"bim-cost-estimation", group:"technical",
+      role:"BIM Cost Estimation of a Residential Build",
+      org:"CIV280 Management of Construction", place:"University of Toronto",
+      dates:"Fall 2025",
+      lede:"A full quantity take-off and cost estimate for a residential house, driven from its Revit BIM model.",
+      bullets:[
+        "Built a component decision matrix across walls, floors, doors, windows and roof, choosing between <b>RSMeans assembly and unit-cost</b> methods for each family and documenting the assumptions behind every call.",
+        "Priced <b>208 RSMeans line items</b> against the Revit model to a total estimated construction cost of <b>$144,629.58 CAD</b>, benchmarked to Toronto and Ontario building codes.",
+        "Designed a 2018&ndash;2025 price-escalation method using Statistics Canada indices (BCPI, IPPI, CUWRI) with separate labour and material weightings.",
+        "Proposed value-engineering alternatives &mdash; VCT in place of ceramic tile, hollow-core in place of solid doors &mdash; saving <b>$6,739</b> against durability, acoustic and lifecycle trade-offs."
+      ],
+      tools:["revit","bim","rsmeans","costanalysis","excel"],
+      facts:[["Course","CIV280 Management of Construction"],["Team","4 students"],["Estimate","$144,629.58 CAD"],["Line items","208"]]
+    },
+    {
+      id:"esp-renewable", group:"technical",
+      role:"Project Manager",
+      org:"ESP Engineering Team", place:"Toronto, ON",
+      dates:"Sep 2024 &mdash; May 2025",
+      lede:"Leading a six-person team designing a solar microgrid for the U of T Sustainability Office.",
+      bullets:[
+        "Led a <b>6 person team</b> designing a solar microgrid for the University of Toronto&rsquo;s sustainability office, modelled to generate <b>1.46 GWh</b> annually and save <b>1,171 tonnes of CO&#8322;</b>, reaching carbon net zero by <b>2038</b>.",
+        "Modelled energy yield across panel efficiency, tilt, azimuth and various system loss factors to an <b>81.23% performance ratio</b>."
+      ],
+      tools:["rhino","solidworks","blender","energymodel","dataanalysis"],
+      facts:[["Role","Project Manager"],["Team","6 people"],["Generation","1.46 GWh / year"],["CO&#8322; saved","1,171 tonnes"]]
+    },
+    {
+      id:"plastiki-rafiki", group:"leadership",
+      role:"Project Leader",
+      org:"Plastiki Rafiki", place:"Nairobi, Kenya",
+      dates:"Sep 2022 &mdash; May 2024",
+      lede:"Running a 22-member student NGO turning collected plastic waste into products for sale.",
+      bullets:[
+        "Led a student-run NGO of <b>22 members</b> creating and selling items made from recycled plastics, generating <b>$6,500 quarterly</b> and diverting an estimated <b>200 kg of plastic waste a month</b> through community collection programs.",
+        "Personally established <b>four production workshops</b>, each employing <b>20 local residents</b> and providing a wage of <b>$11 an hour</b>."
+      ],
+      tools:["autocad","fusion","sketchup","rhino","illustrator","python","3dprint","laser","resin","extrusion","welding","excel","circulareconomy"],
+      facts:[["Role","Project Leader"],["Team","22 members"],["Revenue","$6,500 / quarter"],["Diverted","200 kg / month"]]
+    },
+    {
+      id:"isk-rugby", group:"leadership",
+      role:"Rugby Team Captain",
+      org:"International School of Kenya", place:"Nairobi, Kenya",
+      dates:"2022 &mdash; 2024",
+      lede:"Captaining a 45-player high school squad for two years.",
+      bullets:[
+        "Captained the high school rugby team for <b>two years</b>, leading a roster of <b>45 players</b>.",
+        "Built on lifelong participation in the sport."
+      ],
+      tools:[], extraTools:["Team leadership"],
+      facts:[["Role","Captain"],["Squad","45 players"],["Tenure","2 years"],["School","International School of Kenya"]]
+    },
+    {
+      id:"choksey-albinism", group:"leadership",
+      role:"Team Leader",
+      org:"Dr. Choksey&rsquo;s Albinism Foundation", place:"Nairobi, Kenya",
+      dates:"Jun 2023 &mdash; Feb 2024",
+      lede:"A Python-powered QR donation campaign, piloted in a Nairobi supermarket.",
+      bullets:[
+        "Led a <b>three-person team</b> to develop a Python-powered QR code initiative promoting the foundation and collecting donations.",
+        "Ran a <b>two-month pilot</b> at Carrefour supermarket in Nairobi to support fundraising."
+      ],
+      tools:["python","fundraising"],
+      facts:[["Role","Team Leader"],["Team","3 people"],["Pilot","2 months, Carrefour"],["Location","Nairobi"]]
+    }
+  ];
+
+  function toolTags(p, withData){
+    var out = p.tools.map(function(t){
+      return '<span class="tool"' + (withData ? ' data-t="' + t + '"' : '') + '>' + TOOL_NAMES[t] + '</span>';
+    });
+    (p.extraTools || []).forEach(function(n){ out.push('<span class="tool">' + n + '</span>'); });
+    return out.join("");
+  }
+
+  /* ---------- PAGES ---------- */
+  var PAGES = [
+    {
+      view:"experience", group:"engineering", teaser:"teaserEng", anchor:"work",
+      eyebrow:"Experience", span:"2024 &mdash; present",
+      h1:"Engineering experience",
+      lede:"Internships and design projects, newest first. Open a row for the summary, or go through to its own page."
+    },
+    {
+      view:"volunteer", group:"leadership", teaser:"teaserVol", anchor:"volunteering",
+      eyebrow:"Volunteering", span:"2022 &mdash; present",
+      h1:"Leadership and volunteering",
+      lede:"Community work and student-led ventures, newest first. Open a row for the summary, or go through to its own page."
+    },
+    {
+      view:"projects", group:"technical", teaser:"teaserTech", anchor:"technical",
+      eyebrow:"Technical Projects", span:"2024 &mdash; 2026",
+      h1:"Technical projects",
+      lede:"University engineering projects, newest first. Open a row for the summary, or go through to its own page."
+    }
+  ];
+
+  function inGroup(g){ return PROJECTS.filter(function(p){ return p.group === g; }); }
+  function pageFor(g){ return PAGES.filter(function(x){ return x.group === g; })[0]; }
+
+  function jobCard(p){
+    return '<article class="job" data-tools="' + p.tools.join("|") + '" data-group="' + p.group + '">'
+      + '<button class="job-head" aria-expanded="false">'
+      +   '<h3 class="role">' + p.role + '</h3>'
+      +   '<div class="org">' + p.org + (p.place ? '<span class="place">' + p.place + '</span>' : '') + '</div>'
+      +   '<div class="when-col"><span class="mono">' + p.dates + '</span><span class="exp-open" aria-hidden="true"></span></div>'
+      + '</button>'
+      + '<div class="job-body"><div><div class="job-inner">'
+      +   '<ul>' + p.bullets.slice(0,2).map(function(b){ return "<li>" + b + "</li>"; }).join("") + '</ul>'
+      +   '<div class="tools">' + toolTags(p, true) + '</div>'
+      +   '<a class="more" href="#/w/' + p.id + '">Open full page &rarr;</a>'
+      + '</div></div></div>'
+      + '</article>';
+  }
+
+  PAGES.forEach(function(pg){
+    var list = inGroup(pg.group);
+
+    document.getElementById(pg.teaser).innerHTML = list.map(function(p){
+      return '<a class="tz" href="#/w/' + p.id + '">'
+        + '<span class="r">' + p.role + '</span>'
+        + '<span class="o">' + p.org + '</span>'
+        + '<span class="d">' + p.dates + '</span></a>';
+    }).join("");
+
+    document.getElementById(pg.view).innerHTML =
+      '<div class="wrap dt">'
+    + '<a class="back" href="#' + pg.anchor + '">&larr; Back to home</a>'
+    + '<div class="dt-head">'
+    +   '<div class="dt-eyebrow"><span class="org">' + pg.eyebrow + '</span>'
+    +     '<span class="mono">' + list.length + ' roles</span><span class="mono">' + pg.span + '</span></div>'
+    +   '<h1>' + pg.h1 + '</h1>'
+    +   '<p class="dt-lede">' + pg.lede + '</p>'
+    + '</div>'
+    + '<div class="filter-bar" hidden>'
+    +   '<span class="st">Filtered by</span><span class="chip fb-name">&mdash;</span>'
+    +   '<span class="st fb-count"></span>'
+    +   '<a class="fb-other" href="#" hidden></a>'
+    +   '<button class="clr fb-clear">Clear filter</button>'
+    + '</div>'
+    + '<div class="jobs">' + list.map(jobCard).join("") + '</div>'
+    + '</div>';
+  });
+
+  var ALL_JOBS = Array.prototype.slice.call(document.querySelectorAll(".job"));
+
+  function setOpen(job, open){
+    job.classList.toggle("open", open);
+    job.querySelector(".job-head").setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  ALL_JOBS.forEach(function(job){
+    job.querySelector(".job-head").addEventListener("click", function(){
+      setOpen(job, !job.classList.contains("open"));
+    });
+  });
+  PAGES.forEach(function(pg){
+    var first = document.querySelector("#" + pg.view + " .job");
+    if(first) setOpen(first, true);
+  });
+
+  /* ---------- ROUTER + WAVE TRANSITION ---------- */
+  var applyFilter = null; // wired up by the cross-filter block below
+
+  (function(){
+    var body = document.getElementById("detailBody");
+    var veil = document.getElementById("veil");
+    var busy = false;
+
+    function slideshow(p){
+      var d = SLIDES[p.id] || [];
+      if(!d.length) return "";
+      return '<div class="dt-sec"><h3>Presentation</h3>'
+        + '<button class="deck-open" data-deck="' + p.id + '">'
+        +   '<img class="pv" src="' + d[0].src + '" alt="">'
+        +   '<span>Open slideshow &mdash; ' + d.length + ' slides</span>'
+        +   '<span class="go">&rarr;</span>'
+        + '</button></div>';
+    }
+
+    function gallery(p){
+      var imgs = GALLERY[p.id] || [];
+      if(!imgs.length) return "";
+      return '<div class="dt-sec"><h3>Gallery</h3><div class="gal-grid">'
+        + imgs.map(function(im, i){
+            return '<figure class="gal-fig" data-i="' + i + '" data-p="' + p.id + '">'
+              + '<img src="' + im.src + '" alt="' + im.cap + '" loading="lazy" decoding="async">'
+              + '<figcaption>' + im.cap + '</figcaption></figure>';
+          }).join("")
+        + '</div></div>';
+    }
+
+    function render(p){
+      var peers = inGroup(p.group);
+      var i = peers.indexOf(p);
+      var prev = peers[i-1], next = peers[i+1];
+      var home = pageFor(p.group);
+      var facts = p.facts.map(function(f){
+        return '<div class="fact"><b>' + f[0] + '</b><span>' + f[1] + '</span></div>';
+      }).join("");
+      var extra = (p.sections || []).map(function(s){
+        return '<div class="dt-sec"><h3>' + s.title + '</h3>' + s.body + '</div>';
+      }).join("");
+      var hasTools = p.tools.length || (p.extraTools || []).length;
+
+      body.innerHTML =
+        '<a class="back" href="#/' + home.view + '">&larr; All ' + home.eyebrow.toLowerCase() + '</a>'
+      + '<div class="dt-head">'
+      +   '<div class="dt-eyebrow"><span class="org">' + p.org + '</span>'
+      +     (p.place ? '<span class="mono">' + p.place + '</span>' : '') + '<span class="mono">' + p.dates + '</span></div>'
+      +   '<h1>' + p.role + '</h1>'
+      +   '<p class="dt-lede">' + p.lede + '</p>'
+      + '</div>'
+      + '<div class="dt-grid">'
+      +   '<div><div class="dt-sec"><h3>What I did</h3><ul>'
+      +     p.bullets.map(function(b){ return "<li>" + b + "</li>"; }).join("")
+      +   '</ul></div>' + extra + '</div>'
+      +   '<aside>'
+      +     '<div class="dt-sec"><h3>At a glance</h3><div class="facts">' + facts + '</div></div>'
+      +     (hasTools ? '<div class="dt-sec"><h3>Tools used</h3><div class="tools">' + toolTags(p,false) + '</div></div>' : '')
+      +   '</aside>'
+      + '</div>'
+      + slideshow(p)
+      + gallery(p)
+      + '<div class="nextprev">'
+      +   (prev ? '<a class="np" href="#/w/' + prev.id + '"><span class="lb">&larr; Newer</span><span class="tt">' + prev.role + '</span></a>' : '')
+      +   (next ? '<a class="np r" href="#/w/' + next.id + '"><span class="lb">Older &rarr;</span><span class="tt">' + next.role + '</span></a>' : '')
+      + '</div>';
+    }
+
+    function resolve(){
+      var h = location.hash;
+
+      var w = /^#\/w\/([a-z0-9-]+)$/.exec(h);
+      if(w){
+        var hit = PROJECTS.filter(function(p){ return p.id === w[1]; })[0];
+        if(hit){ render(hit); return "detail"; }
+      }
+
+      var e = /^#\/(experience|volunteer|projects)(?:\/([a-z0-9]+))?$/.exec(h);
+      if(e){
+        if(applyFilter) applyFilter(e[2] && TOOL_NAMES[e[2]] ? e[2] : null);
+        return e[1];
+      }
+
+      return "home";
+    }
+
+    function paint(view, prevView){
+      document.body.setAttribute("data-view", view);
+      if(view === "home"){
+        var t = document.getElementById(location.hash.slice(1) || "top");
+        if(t && prevView !== "home") t.scrollIntoView({block:"start"});
+      } else {
+        window.scrollTo(0,0);
+        var page = document.getElementById(view === "detail" ? "detail" : view);
+        page.classList.remove("page-in");
+        void page.offsetWidth;
+        if(!reduce) page.classList.add("page-in");
+      }
+    }
+
+    function resetVeil(){
+      veil.classList.add("instant");
+      veil.classList.remove("cover","clear");
+      void veil.offsetWidth;
+      veil.classList.remove("instant");
+    }
+
+    function go(){
+      var prev = document.body.getAttribute("data-view") || "home";
+      var next = resolve();
+      if(next === prev && next !== "detail"){ paint(next, prev); return; }
+      if(reduce || busy){ paint(next, prev); return; }
+
+      busy = true;
+      resetVeil();
+      veil.classList.add("cover");           // wave rises across the screen
+      setTimeout(function(){
+        paint(next, prev);                   // swap underneath while covered
+        veil.classList.add("clear");         // wave continues up and off
+        setTimeout(function(){ resetVeil(); busy = false; }, 720);
+      }, 520);
+    }
+
+    var deck = document.getElementById("deck");
+    var deckImg = document.getElementById("deckImg");
+    var deckCount = document.getElementById("deckCount");
+    var deckSet = [], deckAt = 0;
+    function deckShow(i){
+      if(!deckSet.length) return;
+      deckAt = (i + deckSet.length) % deckSet.length;
+      deckImg.src = deckSet[deckAt].src;
+      deckCount.textContent = (deckAt + 1) + " / " + deckSet.length;
+    }
+    function deckClose(){ deck.classList.remove("on"); deckImg.removeAttribute("src"); deckSet = []; }
+    document.getElementById("deckPrev").addEventListener("click", function(e){ e.stopPropagation(); deckShow(deckAt - 1); });
+    document.getElementById("deckNext").addEventListener("click", function(e){ e.stopPropagation(); deckShow(deckAt + 1); });
+    document.getElementById("deckClose").addEventListener("click", deckClose);
+    document.addEventListener("keydown", function(e){
+      if(!deck.classList.contains("on")) return;
+      if(e.key === "ArrowLeft") deckShow(deckAt - 1);
+      else if(e.key === "ArrowRight") deckShow(deckAt + 1);
+      else if(e.key === "Escape") deckClose();
+    });
+
+    var lb = document.getElementById("lightbox");
+    var lbImg = document.getElementById("lbImg");
+    var lbCap = document.getElementById("lbCap");
+    function closeLb(){ lb.classList.remove("on"); lbImg.removeAttribute("src"); }
+    body.addEventListener("click", function(e){
+      var opener = e.target.closest && e.target.closest(".deck-open");
+      if(opener){
+        deckSet = SLIDES[opener.dataset.deck] || [];
+        if(deckSet.length){ deck.classList.add("on"); deckShow(0); }
+        return;
+      }
+      var fig = e.target.closest && e.target.closest(".gal-fig");
+      if(!fig) return;
+      var set = GALLERY[fig.dataset.p] || [];
+      var im = set[+fig.dataset.i];
+      if(!im) return;
+      lbImg.src = im.src; lbCap.textContent = im.cap; lb.classList.add("on");
+    });
+    lb.addEventListener("click", closeLb);
+    document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeLb(); });
+
+    window.addEventListener("hashchange", go);
+    document.body.setAttribute("data-view", resolve());
+    if(document.body.getAttribute("data-view") !== "home") window.scrollTo(0,0);
+  })();
+
+  /* ---------- NAME ---------- */
+  (function(){
+    var el = document.getElementById("name");
+    var idx = 0;
+    ["NIRVAAN","SHAH"].forEach(function(w, wi){
+      var ws = document.createElement("span");
+      ws.className = "w";
+      w.split("").forEach(function(ch){
+        var s = document.createElement("span");
+        s.className = "c" + (wi === 1 ? " k" : "");
+        s.textContent = ch;
+        s.style.transitionDelay = (idx * 0.036) + "s";
+        idx++;
+        ws.appendChild(s);
+      });
+      el.appendChild(ws);
+    });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.add("lit"); }); });
+  })();
+
+  /* ---------- GRID PARALLAX ---------- */
+  if(!reduce){
+    var bg = document.getElementById("gridbg"), lastY = -1;
+    window.addEventListener("scroll", function(){
+      var y = window.scrollY;
+      if(Math.abs(y - lastY) < 2) return;
+      lastY = y;
+      bg.style.transform = "translate3d(0," + (-(y * 0.06) % 64) + "px,0)";
+    }, {passive:true});
+  }
+
+  /* ---------- REVEALS ---------- */
+  (function(){
+    var items = Array.prototype.slice.call(document.querySelectorAll(".rv"));
+    function showAll(){ items.forEach(function(el){ el.classList.add("in"); }); }
+    if(reduce || !("IntersectionObserver" in window)){ showAll(); return; }
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, {rootMargin:"0px 0px -8% 0px", threshold:0.04});
+    items.forEach(function(el){ io.observe(el); });
+    setTimeout(showAll, 2600);
+  })();
+
+  /* ---------- COUNT-UP ---------- */
+  (function(){
+    var nums = Array.prototype.slice.call(document.querySelectorAll(".qty .n"));
+    function fmt(v, el){
+      var s = el.dataset.comma ? Math.round(v).toLocaleString("en-US") : String(Math.round(v));
+      return (el.dataset.pre || "") + s + (el.dataset.post || "");
+    }
+    function run(el){
+      var to = parseFloat(el.dataset.to);
+      if(reduce){ el.textContent = fmt(to, el); return; }
+      var t0 = performance.now();
+      requestAnimationFrame(function step(t){
+        var p = Math.min(1, (t - t0) / 1150);
+        el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)), el);
+        if(p < 1) requestAnimationFrame(step);
+      });
+    }
+    if(!("IntersectionObserver" in window)){ nums.forEach(run); return; }
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ run(e.target); io.unobserve(e.target); } });
+    }, {threshold:0.5});
+    nums.forEach(function(el){ io.observe(el); });
+  })();
+
+  /* ---------- SKILL CROSS-FILTER ---------- */
+  (function(){
+    var sks = Array.prototype.slice.call(document.querySelectorAll(".sk[data-tool]"));
+    var active = null;
+
+    sks.forEach(function(sk){
+      sk.querySelector(".ct").textContent = PROJECTS.filter(function(p){
+        return p.tools.indexOf(sk.dataset.tool) > -1;
+      }).length;
+    });
+
+    function currentView(){
+      var v = document.body.dataset.view;
+      return PAGES.some(function(x){ return x.view === v; }) ? v : PAGES[0].view;
+    }
+
+    function hitsIn(group, tool){
+      return inGroup(group).filter(function(p){ return p.tools.indexOf(tool) > -1; }).length;
+    }
+
+    function apply(tool){
+      active = tool;
+
+      ALL_JOBS.forEach(function(j){
+        var has = !!tool && (j.dataset.tools || "").split("|").indexOf(tool) > -1;
+        j.classList.toggle("dim", !!tool && !has);
+        j.classList.toggle("hit", has);
+        if(has) setOpen(j, true);
+        Array.prototype.forEach.call(j.querySelectorAll(".tool"), function(tl){
+          tl.classList.toggle("match", !!tool && tl.dataset.t === tool);
+        });
+      });
+
+      sks.forEach(function(s){ s.classList.toggle("on", s.dataset.tool === tool); });
+
+      PAGES.forEach(function(pg){
+        var bar = document.querySelector("#" + pg.view + " .filter-bar");
+        if(!tool){ bar.hidden = true; return; }
+        var mine = hitsIn(pg.group, tool);
+        var others = PAGES.filter(function(x){ return x !== pg && hitsIn(x.group, tool) > 0; })
+                          .sort(function(a,b){ return hitsIn(b.group,tool) - hitsIn(a.group,tool); });
+
+        bar.querySelector(".fb-name").textContent = TOOL_NAMES[tool];
+        bar.querySelector(".fb-count").textContent =
+          mine + (mine === 1 ? " role" : " roles") + " of " + inGroup(pg.group).length;
+
+        var link = bar.querySelector(".fb-other");
+        if(others.length){
+          var o = others[0];
+          link.textContent = "also " + hitsIn(o.group, tool) + " in " + o.eyebrow.toLowerCase() + " \u2192";
+          link.setAttribute("href", "#/" + o.view + "/" + tool);
+          link.hidden = false;
+        } else {
+          link.hidden = true;
+        }
+        bar.hidden = false;
+      });
+    }
+
+    // Clicking a skill opens whichever page holds it, already filtered.
+    sks.forEach(function(sk){
+      sk.addEventListener("click", function(){
+        var tool = sk.dataset.tool;
+        if(active === tool){ location.hash = "#/" + currentView(); return; }
+        var target = PAGES.filter(function(x){ return hitsIn(x.group, tool) > 0; })[0] || PAGES[0];
+        location.hash = "#/" + target.view + "/" + tool;
+      });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".fb-clear"), function(btn){
+      btn.addEventListener("click", function(){ location.hash = "#/" + currentView(); });
+    });
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape" && active){ location.hash = "#/" + currentView(); }
+    });
+
+    applyFilter = apply;
+    // the router ran before this block existed, so honour a filter in the opening URL
+    var m = /^#\/(?:experience|volunteer|projects)\/([a-z0-9]+)$/.exec(location.hash);
+    if(m && TOOL_NAMES[m[1]]) apply(m[1]);
+  })();
+
+  /* ---------- LANGUAGES ---------- */
+  (function(){
+    var btns = Array.prototype.slice.call(document.querySelectorAll(".lg"));
+    var g = document.getElementById("greet"), sub = document.getElementById("greetSub");
+    btns.forEach(function(b){
+      b.addEventListener("click", function(){
+        btns.forEach(function(x){ x.classList.remove("on"); });
+        b.classList.add("on");
+        g.textContent = b.dataset.g;
+        sub.innerHTML = b.dataset.note;
+        g.classList.remove("flip"); void g.offsetWidth; g.classList.add("flip");
+      });
+    });
+  })();
+
+  /* ---------- STATION RAIL ---------- */
+  (function(){
+    var fill = document.getElementById("railFill");
+    var head = document.getElementById("railHead");
+    var sta  = document.getElementById("railSta");
+    var nav  = document.getElementById("railNav");
+    var ticks= document.getElementById("railTicks");
+
+    var secs = [
+      {id:"top",label:"Start"},{id:"numbers",label:"Quantities"},{id:"about",label:"Profile"},
+      {id:"work",label:"Experience"},{id:"technical",label:"Projects"},{id:"volunteering",label:"Volunteering"},
+      {id:"skills",label:"Skills"},{id:"languages",label:"Languages"},
+      {id:"contact",label:"Contact"}
+    ];
+
+    secs.forEach(function(s){
+      var a = document.createElement("a");
+      a.className = "rail-dot"; a.href = "#" + s.id;
+      a.innerHTML = '<i></i><span>' + s.label + '</span>';
+      nav.appendChild(a);
+      var tk = document.createElement("div");
+      tk.className = "rail-tick"; ticks.appendChild(tk);
+      s.el = document.getElementById(s.id); s.dot = a; s.tick = tk;
+    });
+
+    function place(){
+      var docH = document.documentElement.scrollHeight - window.innerHeight;
+      secs.forEach(function(s){
+        var p = docH > 0 ? Math.min(1, Math.max(0, s.el.offsetTop / docH)) : 0;
+        s.p = p;
+        s.dot.style.top = (p*100) + "%";
+        s.tick.style.top = (p*100) + "%";
+      });
+    }
+    function update(){
+      var docH = document.documentElement.scrollHeight - window.innerHeight;
+      var p = docH > 0 ? Math.min(1, Math.max(0, window.scrollY / docH)) : 0;
+      fill.style.height = (p*100) + "%";
+      head.style.top = (132 + p * (window.innerHeight - 232)) + "px";
+      sta.textContent = Math.round(p * 100) + "%";
+      var cur = 0;
+      secs.forEach(function(s,i){ if(s.p !== undefined && p >= s.p - 0.02) cur = i; });
+      secs.forEach(function(s,i){
+        s.dot.classList.toggle("on", i === cur);
+        s.tick.classList.toggle("on", i === cur);
+      });
+    }
+    place(); update();
+    window.addEventListener("scroll", update, {passive:true});
+    window.addEventListener("resize", function(){ place(); update(); }, {passive:true});
+    setTimeout(function(){ place(); update(); }, 900);
+  })();
+
+  /* ---------- RESUME DOWNLOAD ---------- */
+  (function(){
+    var node = document.getElementById("resumeData");
+    var b64 = node ? node.textContent.trim() : "";
+    var has = b64 && b64.indexOf("__RESUME") !== 0;
+    var FILE = "Nirvaan-Shah-Resume.pdf";
+    var MIME = "application/pdf";
+    var saver = null, busy = false;
+
+    if(window.claude && typeof window.claude.use === "function"){
+      window.claude.use("downloads").then(function(d){ saver = d; }).catch(function(){});
+    }
+
+    function bytes(){
+      var bin = atob(b64), out = new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+      return out;
+    }
+    function fallback(){
+      var a = document.createElement("a");
+      a.href = "resume.pdf"; a.download = FILE;
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+    function label(btn, msg, ms){
+      if(!btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
+      btn.innerHTML = msg;
+      setTimeout(function(){ btn.innerHTML = btn.dataset.orig; }, ms);
+    }
+    function go(btn){
+      if(!has){ label(btn, "Not attached yet", 2000); return; }
+      if(busy) return;
+      busy = true;
+      label(btn, "Preparing", 1600);
+      if(saver){
+        saver.save({filename:FILE, data:bytes()})
+          .then(function(){ busy = false; label(btn, "Saved", 1400); })
+          .catch(function(){ fallback(); busy = false; });
+      } else {
+        fallback(); busy = false;
+      }
+    }
+    ["resumeBtn","resumeBtn2"].forEach(function(id){
+      var b = document.getElementById(id);
+      if(b) b.addEventListener("click", function(){ go(b); });
+    });
+  })();
+
+  /* ---------- MAGNETIC BUTTONS ---------- */
+  if(!reduce && !window.matchMedia("(hover: none)").matches){
+    Array.prototype.forEach.call(document.querySelectorAll(".btn"), function(btn){
+      btn.addEventListener("mousemove", function(e){
+        var r = btn.getBoundingClientRect();
+        btn.style.transform = "translate(" + ((e.clientX - (r.left + r.width/2)) / r.width * 6) + "px,"
+                            + ((e.clientY - (r.top + r.height/2)) / r.height * 6) + "px)";
+      });
+      btn.addEventListener("mouseleave", function(){ btn.style.transform = ""; });
+    });
+  }
+
+  /* ---------- SMOOTH ANCHORS (skip routes) ---------- */
+  document.addEventListener("click", function(e){
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if(!a) return;
+    var href = a.getAttribute("href");
+    if(href.indexOf("#/") === 0) return;
+    if(document.body.getAttribute("data-view") !== "home") return;
+    var el = document.getElementById(href.slice(1));
+    if(!el) return;
+    e.preventDefault();
+    el.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"});
+  });
+})();
+</script>
+
+</body>
+</html>
