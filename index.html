@@ -252,11 +252,17 @@ body.detail .rail{display:none}
 .qty:hover{background:var(--bg-raise)}
 .qty .n{
   font-family:var(--f-display);font-variation-settings:var(--xwide);
-  font-weight:800;font-size:clamp(32px,5vw,50px);
+  font-weight:800;font-size:clamp(28px,3.6vw,44px);
   line-height:.94;letter-spacing:-.03em;font-variant-numeric:tabular-nums;
 }
 .qty .l{font-size:13.5px;color:var(--ink-soft);line-height:1.45}
 .qty .src{margin-top:auto;padding-top:10px}
+.qty-head{display:flex;align-items:baseline;gap:12px;margin:26px 0 12px}
+.qty-head:first-of-type{margin-top:6px}
+.qty-head .mono{color:var(--accent)}
+.qty-head h3{margin:0;font-size:15px;font-weight:600;letter-spacing:.01em;color:var(--ink)}
+.qty .n{white-space:nowrap}
+.qty .n .u{font-size:.42em;font-weight:600;letter-spacing:0;margin-left:.2em;color:var(--ink-soft)}
 
 /* ============ ABOUT ============ */
 .about-grid{display:grid;gap:clamp(26px,4vw,48px);grid-template-columns:1fr}
@@ -615,13 +621,21 @@ body:not([data-view="home"]) .rail{display:none}
   <div class="sheet-label rv">
     <span class="tag">Impact</span>
     <h2>By the numbers</h2>
-    <span class="note mono">All figures from work I led</span>
+    <span class="note mono">Selected figures from my work</span>
   </div>
+  <div class="qty-head rv d1"><span class="mono">01</span><h3>Engineering &amp; environment</h3></div>
   <div class="qty-grid rv d1">
-    <div class="qty"><span class="n" data-to="10000" data-comma="1" data-post="+">0</span><span class="l">students reached at the Drop &amp; Dash Tech Challenge</span><span class="src mono">The Tech Interactive, 2025</span></div>
-    <div class="qty"><span class="n" data-to="1171" data-comma="1">0</span><span class="l">tonnes of CO&#8322; saved by the microgrid design</span><span class="src mono">MonoSolar, U of T</span></div>
-    <div class="qty"><span class="n" data-to="50000" data-pre="$" data-comma="1">$0</span><span class="l">secured in funding and sponsorships</span><span class="src mono">Still I Rise</span></div>
-    <div class="qty"><span class="n" data-to="80">0</span><span class="l">local residents employed across four workshops</span><span class="src mono">Plastiki Rafiki</span></div>
+    <div class="qty"><span class="n" data-to="1171" data-comma="1">0</span><span class="l">tonnes of CO&#8322; saved by a solar microgrid I modelled at 1.46 GWh a year</span><span class="src mono">MonoSolar &middot; U of T</span></div>
+    <div class="qty"><span class="n" data-to="50000" data-comma="1" data-post="+">0</span><span class="l">grid measurements and scenarios analysed with Python models</span><span class="src mono">Evardi &middot; 2026</span></div>
+    <div class="qty"><span class="n" data-to="45">0</span><span class="l">compliance gaps found across 220 regulated substances ahead of an inspection</span><span class="src mono">Testo &middot; Germany</span></div>
+    <div class="qty"><span class="n" data-to="10039" data-comma="1" data-unit="km&sup2;">0</span><span class="l">boreal watershed delineated in ArcGIS from a 30 m elevation model</span><span class="src mono">Fontas River &middot; BC</span></div>
+  </div>
+  <div class="qty-head rv d1"><span class="mono">02</span><h3>Leadership &amp; community</h3></div>
+  <div class="qty-grid rv d1">
+    <div class="qty"><span class="n" data-to="10000" data-comma="1" data-post="+">0</span><span class="l">students reached by the engineering challenge where I mentored 80 teams</span><span class="src mono">The Tech Interactive &middot; 2025</span></div>
+    <div class="qty"><span class="n" data-to="50000" data-pre="$" data-comma="1">$0</span><span class="l">in funding and sponsorships for a free IB school in Mathare</span><span class="src mono">Still I Rise</span></div>
+    <div class="qty"><span class="n" data-to="80">0</span><span class="l">local residents employed across four workshops I set up</span><span class="src mono">Plastiki Rafiki</span></div>
+    <div class="qty"><span class="n" data-to="200" data-unit="kg">0</span><span class="l">of plastic waste diverted each month through community collection</span><span class="src mono">Plastiki Rafiki</span></div>
   </div>
 </section>
 
@@ -1535,15 +1549,15 @@ body:not([data-view="home"]) .rail{display:none}
     var nums = Array.prototype.slice.call(document.querySelectorAll(".qty .n"));
     function fmt(v, el){
       var s = el.dataset.comma ? Math.round(v).toLocaleString("en-US") : String(Math.round(v));
-      return (el.dataset.pre || "") + s + (el.dataset.post || "");
+      return (el.dataset.pre || "") + s + (el.dataset.post || "") + (el.dataset.unit ? '<small class="u">' + el.dataset.unit + '</small>' : "");
     }
     function run(el){
       var to = parseFloat(el.dataset.to);
-      if(reduce){ el.textContent = fmt(to, el); return; }
+      if(reduce){ el.innerHTML = fmt(to, el); return; }
       var t0 = performance.now();
       requestAnimationFrame(function step(t){
         var p = Math.min(1, (t - t0) / 1150);
-        el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)), el);
+        el.innerHTML = fmt(to * (1 - Math.pow(1 - p, 3)), el);
         if(p < 1) requestAnimationFrame(step);
       });
     }
