@@ -1793,7 +1793,7 @@ body:not([data-view="home"]) .rail{display:none}
   (function(){
     var node = document.getElementById("resumeData");
     var b64 = node ? node.textContent.trim() : "";
-    var has = b64 && b64.indexOf("__RESUME") !== 0;
+    var has = true;  // deploy build: resume.pdf is served as a file
     var FILE = "Nirvaan-Shah-Resume.pdf";
     var MIME = "application/pdf";
     var saver = null, busy = false;
@@ -1822,13 +1822,7 @@ body:not([data-view="home"]) .rail{display:none}
       if(busy) return;
       busy = true;
       label(btn, "Preparing", 1600);
-      if(saver){
-        saver.save({filename:FILE, data:bytes()})
-          .then(function(){ busy = false; label(btn, "Saved", 1400); })
-          .catch(function(){ fallback(); busy = false; });
-      } else {
-        fallback(); busy = false;
-      }
+      fallback(); busy = false;
     }
     ["resumeBtn","resumeBtn2"].forEach(function(id){
       var b = document.getElementById(id);
